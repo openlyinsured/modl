@@ -14,7 +14,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 
@@ -44,9 +43,14 @@ type DbMap struct {
 	Dialect Dialect
 
 	tables    []*TableMap
-	logger    *log.Logger
+	logger    Logger
 	logPrefix string
 	mapper    *reflectx.Mapper
+}
+
+// Logger is an interface to the limited logging functions used
+type Logger interface {
+	Printf(format string, v ...interface{})
 }
 
 // NewDbMap returns a new DbMap using the db connection and dialect.
@@ -66,7 +70,7 @@ func NewDbMap(db *sql.DB, dialect Dialect) *DbMap {
 //
 // Use TraceOn if you want to spy on the SQL statements that modl
 // generates.
-func (m *DbMap) TraceOn(prefix string, logger *log.Logger) {
+func (m *DbMap) TraceOn(prefix string, logger Logger) {
 	m.logger = logger
 	if len(prefix) == 0 {
 		m.logPrefix = prefix
